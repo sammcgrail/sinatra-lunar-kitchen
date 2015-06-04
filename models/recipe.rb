@@ -1,6 +1,5 @@
 require 'pg'
 require 'pry'
-
 def db_connection
   begin
     connection = PG.connect(dbname: "recipes")
@@ -9,15 +8,22 @@ def db_connection
     connection.close
   end
 end
-
 class Recipe
-attr_accessor :id, :name, :instructions, :recipes, :recipe_list
+attr_accessor :id, :name, :instructions, :description
   def initialize(id, name, instructions, description)
     @id = id
     @name = name
     @instructions = instructions
     @description = description
-    @recipes = recipes
+  end
+
+  def self.find(recipe_id)
+    recipes = all
+    recipes.each do |recipe|
+      if recipe_id == recipe.id
+        return recipe
+      end
+    end
   end
 
   def self.all
@@ -28,44 +34,20 @@ attr_accessor :id, :name, :instructions, :recipes, :recipe_list
       db_list.each do |rec|
         recipes << Recipe.new(rec["id"], rec["name"], rec["instructions"], rec["description"])
       end
-      return recipes
+      recipes
     end
   end
-  #
-  # "SELECT ingredients.id, ingredients.name
-  #                       FROM ingredients
-  #                       WHERE #{id} = ingredients.recipe_id;"
 
-
-  # def id
-  #   recipes.each do |data|
-  #     if data["id"] == params[:id]
-  #       return data["id"]
-  #     end
-  #   end
-  # end
-  #
-  # def description
-  #   @description
-  # end
-  #
-  # def instructions
-  #   @instructions
-  # end
-  #
-  # def find(id)
-  #   recipse.each do |data|
-  #     if data["id"] == id
-  #       return data["id"]
-  #     end
-  #   end
-  # end
-  #
-
-
-
+  def ingredients
+    ingredients = []
+    ingredients_db_hit = db_connection do |conn|
+                                  conn.exec("SELECT ingredients.id,
+                                  ingredients.name FROM ingredients
+                                  WHERE #{id} = ingredients.recipe_id;")
+                                end
+    ingredients_db_hit.each do |ingred|
+      ingredients << Ingredient.new(ingred["id"], ingred["name"])
+    end
+    ingredients
+  end
 end
-
-
-# Recipe.all
-# puts Recipe.all
