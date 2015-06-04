@@ -1,7 +1,6 @@
 require 'pg'
 require 'pry'
 
-
 def db_connection
   begin
     connection = PG.connect(dbname: "recipes")
@@ -12,46 +11,61 @@ def db_connection
 end
 
 class Recipe
-
-  def initialize
-    @recipes = recipe_list
+attr_accessor :id, :name, :instructions, :recipes, :recipe_list
+  def initialize(id, name, instructions, description)
+    @id = id
+    @name = name
+    @instructions = instructions
+    @description = description
+    @recipes = recipes
   end
 
   def self.all
-    recipe_list = []
+    recipes = []
+    db_list = []
     db_connection do |conn|
-      recipe_list = conn.exec("SELECT * FROM recipes LIMIT 50")
-      binding.pry
-      recipes = []
-      recipe_list.each do |item|
-        Recipe.new
+      db_list = conn.exec("SELECT * FROM recipes")
+      db_list.each do |rec|
+        recipes << Recipe.new(rec["id"], rec["name"], rec["instructions"], rec["description"])
       end
-      []
+      return recipes
     end
   end
+  #
+  # "SELECT ingredients.id, ingredients.name
+  #                       FROM ingredients
+  #                       WHERE #{id} = ingredients.recipe_id;"
 
-  def name
-    #pseudo
-  end
 
-  def id
-    #pseudo
-  end
+  # def id
+  #   recipes.each do |data|
+  #     if data["id"] == params[:id]
+  #       return data["id"]
+  #     end
+  #   end
+  # end
+  #
+  # def description
+  #   @description
+  # end
+  #
+  # def instructions
+  #   @instructions
+  # end
+  #
+  # def find(id)
+  #   recipse.each do |data|
+  #     if data["id"] == id
+  #       return data["id"]
+  #     end
+  #   end
+  # end
+  #
+
+
 
 end
 
 
-
-
 # Recipe.all
-#
-# new_test = Recipe.new
-# puts new_test.recipes.to_a
-
-
-
-
-  # class << self
-  #   def all
-  #   end
-  # end
+# puts Recipe.all
