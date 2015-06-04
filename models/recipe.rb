@@ -2,9 +2,9 @@ require 'pg'
 require 'pry'
 
 class Recipe
-
-  def initialize(recipes, recipe_list)
-    @recipes = recipe_list
+  attr_accessor :recipe_list
+  def initialize
+    @recipes = []
   end
 
   def db_connection
@@ -20,11 +20,12 @@ class Recipe
     @recipes
   end
 
-  def recipe_list
-    recipe_list =
-    binding.pry
+  def recipes
     db_connection do |conn|
-      conn.exec("SELECT name FROM recipes LIMIT 50")
+      @recipes = conn.exec("SELECT * FROM recipes LIMIT 50")
     end
   end
 end
+
+new_test = Recipe.new
+puts new_test.recipes.to_a
