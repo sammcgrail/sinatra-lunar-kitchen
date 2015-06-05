@@ -6,8 +6,4 @@ class Ingredient
     @id = id
     @name = name
   end
-
-
-
-
 end
